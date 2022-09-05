@@ -11,17 +11,27 @@ export function save() {
   fs.writeFileSync("cases.json", JSON.stringify(cases, null, 2))
 }
 
+function nextId() { 
+  return cases.length
+}
+
 export function newCase(summary: string, severity: Severity) {
+  const id = nextId()
   cases.push({
-    id: cases.length, 
+    id, 
     summary, 
     log: [{ timestamp: Date.now(), comment: "new case", severity, status: "unassigned" }],
   })
   save()
+  return id
+}
+
+export function getCase(id: number) {
+  return cases.find(c => c.id === id)
 }
 
 export function updateCase(id: number, logEntry: Partial<LogEntry>) {
-  const c = cases.find(c => c.id === id)
+  const c = getCase(id)
   c.log.unshift({ ...c.log[0], timestamp: Date.now(), ...logEntry })
   save()
 }

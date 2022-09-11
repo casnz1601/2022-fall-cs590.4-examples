@@ -24,6 +24,10 @@ app.get('/', (req, res) => {
   res.status(200).json([...nameList])
 })
 
+app.get('/current-list', (req, res) => {
+  res.status(200).json([...nameList])
+})
+
 app.put("/signup", (req, res) => {
   if (typeof req.body.name === "string") {
     nameList.add(req.body.name)

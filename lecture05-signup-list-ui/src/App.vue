@@ -26,9 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, Ref } from 'vue'
 
-const currentList = ref([])
+const currentList: Ref<string[]> = ref([])
 const name = ref("")
 
 // async function refresh() {

@@ -38,13 +38,13 @@ export function getList(listId: Id): TodoList | null {
 	return todoLists.filter(l => l.id === listId)[0] || null
 }
 
-export function addList(name: string) {
+export function addList(name: string): Id {
 	const newList: TodoList = { id: nextId(), name, items: [] }
 	todoLists.push(newList)
 	return newList.id
 }
 
-export function addItemToList(listId: Id, item: Omit<TodoItem, "id">) {
+export function addItemToList(listId: Id, item: Omit<TodoItem, "id">): Id | null {
   const list = getList(listId)
   if (!list) {
     return null
@@ -54,7 +54,7 @@ export function addItemToList(listId: Id, item: Omit<TodoItem, "id">) {
 	return id
 }
 
-export function updateItemOnList(listId: Id, itemId: Id, update: Partial<TodoItem>) {
+export function updateItemOnList(listId: Id, itemId: Id, update: Partial<TodoItem>): number {
 	const list = getList(listId)
 	if (!list) {
 		return 0

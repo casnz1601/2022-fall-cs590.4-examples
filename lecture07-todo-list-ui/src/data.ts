@@ -45,22 +45,29 @@ export function addList(name: string) {
 }
 
 export function addItemToList(listId: Id, item: Omit<TodoItem, "id">) {
+  const list = getList(listId)
+  if (!list) {
+    return null
+  }
 	const id = nextId()
-	getList(listId)?.items?.push({ ...item, id })
+	list.items?.push({ ...item, id })
 	return id
 }
 
 export function updateItemOnList(listId: Id, itemId: Id, update: Partial<TodoItem>) {
 	const list = getList(listId)
 	if (!list) {
-		return
+		return 0
 	}
 
+  let itemsUpdated = 0
 	list.items = list.items.map(x => {
 		if (x.id === itemId) {
+      ++itemsUpdated
 			return { ...x, ...update }
 		} else {
 			return x
 		}
 	})
+  return itemsUpdated
 }

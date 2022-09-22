@@ -19,11 +19,9 @@
                 v-for="list, i in lists"
                 :key="i"
                 class="d-flex justify-content-between align-items-center"
-                @click="selectList(list.id)"
-                href="#"
                 :class="{ 'font-weight-bold': selectedList?.id === list.id }"
               >
-                <span :title="list.id">{{ list.name }}</span>
+                <span @click="selectList(list.id)" title="list.id">{{ list.name }}</span>
                 <b-badge variant="dark" pill>{{ list.count }}</b-badge>
               </b-list-group-item>
               <b-list-group-item>

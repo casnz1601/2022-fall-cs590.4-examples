@@ -28,6 +28,16 @@
 
     <b-button class="mr-2 mb-2" @click="handleClickSampleCard1">Sample Card 1</b-button>
     <b-button class="mr-2 mb-2" @click="handleClickSampleCard2">Sample Card 2</b-button>
+
+    <hr/>
+
+    <b-button class="mr-2 mb-2" :disabled="!canUndo" @click="undo">Undo</b-button>
+    <b-button class="mr-2 mb-2" :disabled="!canRedo" @click="redo">Redo</b-button>
+    <ol style="overflow-y: scroll; max-height: 6rem">
+      <li v-for="x, i in undoRedoBuffer" :key="i">
+        <pre :class="{ 'font-weight-bold': i === undoRedoIndex }">{{x}}</pre>
+      </li>
+    </ol>
   </div>
 </template>
 
@@ -78,7 +88,37 @@ function handleClickSampleCard2() {
   loadSampleCard(sampleCards[1])  
 }
 
+const undoRedoBuffer = ref([JSON.stringify(currentCard.value)])
+let undoRedoIndex = ref(0)
+
+function undo() {
+  // TODO:
+}
+
+const canUndo = computed(() => 
+  // TODO:
+  false
+)
+
+function redo() {
+  // TODO:
+}
+
+const canRedo = computed(() => 
+  // TODO:
+  false
+)
+
 watch(currentCard, () => {
-  console.log("card updated!", JSON.stringify(currentCard.value))
+  const newString = JSON.stringify(currentCard.value)
+  if (undoRedoIndex.value !== -1 && undoRedoBuffer.value[undoRedoIndex.value] === newString) {
+    return
+  }
+  if (undoRedoIndex.value + 1 === undoRedoBuffer.value.length) {
+    undoRedoBuffer.value.push(newString)
+  } else {
+    undoRedoBuffer.value.splice(undoRedoIndex.value + 1, undoRedoBuffer.value.length, newString)
+  }
+  ++undoRedoIndex.value
 }, { deep: true })
 </script>

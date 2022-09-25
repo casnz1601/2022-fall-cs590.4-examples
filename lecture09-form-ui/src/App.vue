@@ -19,10 +19,15 @@
       <b-form-group
         label="E-mail address:"
         label-for="email-input"
-        description="Your e-mail address will be kept confidential."
       >
         <b-form-input id="email-input" v-model="currentCard.email" :state="!emailValidation" type="email" placeholder="jane.doe@notreal.cs.duke.edu" required />
         <b-form-invalid-feedback :state="!emailValidation">{{ emailValidation }}</b-form-invalid-feedback>
+      </b-form-group>
+      <b-form-group
+        label="Birthday:"
+        label-for="birthday-input"
+      >
+        <b-form-datepicker id="birthday-input" v-model="currentCard.birthday" />
       </b-form-group>
     </b-form>
 
@@ -48,9 +53,10 @@ interface ContactCard {
   firstName: string
   lastName: string
   email: string
+  birthday: string
 }
 
-const currentCard: Ref<ContactCard> = ref({ firstName: "", lastName: "", email: "" })
+const currentCard: Ref<ContactCard> = ref({ firstName: "", lastName: "", email: "", birthday: "" })
 
 const emailValidation = computed(() => {
   if (currentCard.value.email.length === 0) {
@@ -66,12 +72,14 @@ const sampleCards: ContactCard[] = [
   {
     firstName: "John",
     lastName: "Smith",
-    email: "john.smith@notreal.cs.duke.edu"
+    email: "john.smith@notreal.cs.duke.edu",
+    birthday: "1900-01-01",
   },
   {
     firstName: "Wei",
     lastName: "Zhang",
-    email: "wei.zhang@notreal.cs.duke.edu"
+    email: "wei.zhang@notreal.cs.duke.edu",
+    birthday: "1990-01-01",
   },
 ]
 
@@ -92,22 +100,16 @@ const undoRedoBuffer = ref([JSON.stringify(currentCard.value)])
 let undoRedoIndex = ref(0)
 
 function undo() {
-  // TODO:
+  currentCard.value = JSON.parse(undoRedoBuffer.value[--undoRedoIndex.value])
 }
 
-const canUndo = computed(() => 
-  // TODO:
-  false
-)
+const canUndo = computed(() => undoRedoIndex.value > 0)
 
 function redo() {
-  // TODO:
+  currentCard.value = JSON.parse(undoRedoBuffer.value[++undoRedoIndex.value])
 }
 
-const canRedo = computed(() => 
-  // TODO:
-  false
-)
+const canRedo = computed(() => undoRedoIndex.value + 1 !== undoRedoBuffer.value.length)
 
 watch(currentCard, () => {
   const newString = JSON.stringify(currentCard.value)

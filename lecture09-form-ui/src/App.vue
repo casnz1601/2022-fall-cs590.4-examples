@@ -1,64 +1,85 @@
 <template>
   <div class="mx-3 my-3">
-    <!-- header -->
-    <b-jumbotron header="Contact Card Editor" />
+    <b-jumbotron header="Contact Card Editor" :lead="dirty ? 'You have unsaved changes.' : 'All changes saved.'" />
 
-    <b-form>
-      <b-form-group
-        label="First name:"
-        label-for="first-name-input"
-      >
-        <b-form-input id="first-name-input" v-model="currentCard.firstName" placeholder="Jane" />
-      </b-form-group>
-      <b-form-group
-        label="Last name:"
-        label-for="last-name-input"
-      >
-        <b-form-input id="last-name-input" v-model="currentCard.lastName" placeholder="Doe" />
-      </b-form-group>
-      <b-form-group
-        label="E-mail address:"
-        label-for="email-input"
-      >
-        <b-form-input id="email-input" v-model="currentCard.email" :state="!emailValidation" type="email" placeholder="jane.doe@notreal.cs.duke.edu" required />
-        <b-form-invalid-feedback :state="!emailValidation">{{ emailValidation }}</b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group
-        label="Birthday:"
-        label-for="birthday-input"
-      >
-        <b-form-datepicker id="birthday-input" v-model="currentCard.birthday" />
-      </b-form-group>
-    </b-form>
+    <b-container fluid class="my-4">
+      <b-row>
+        <b-col xs="12" sm="9">
+          <b-form>
+            <b-form-group
+              label="First name:"
+              label-for="first-name-input"
+            >
+              <b-form-input id="first-name-input" v-model="currentCard.firstName" placeholder="Jane" />
+            </b-form-group>
+            <b-form-group
+              label="Last name:"
+              label-for="last-name-input"
+            >
+              <b-form-input id="last-name-input" v-model="currentCard.lastName" placeholder="Doe" />
+            </b-form-group>
+            <b-form-group
+              label="E-mail address:"
+              label-for="email-input"
+            >
+              <b-form-input id="email-input" v-model="currentCard.email" :state="!emailValidation" type="email" placeholder="jane.doe@notreal.cs.duke.edu" required />
+              <b-form-invalid-feedback :state="!emailValidation">{{ emailValidation }}</b-form-invalid-feedback>
+            </b-form-group>
+            <b-form-group
+              label="Birthday:"
+              label-for="birthday-input"
+            >
+              <b-form-datepicker id="birthday-input" v-model="currentCard.birthday" />
+            </b-form-group>
+          </b-form>
 
-    <b-button class="mr-2 mb-2" @click="handleClickSampleCard1">Sample Card 1</b-button>
-    <b-button class="mr-2 mb-2" @click="handleClickSampleCard2">Sample Card 2</b-button>
-
-    <hr/>
-
-    <b-button class="mr-2 mb-2" :disabled="!canUndo" @click="undo">Undo</b-button>
-    <b-button class="mr-2 mb-2" :disabled="!canRedo" @click="redo">Redo</b-button>
-    <ol style="overflow-y: scroll; max-height: 6rem">
-      <li v-for="x, i in undoRedoBuffer" :key="i">
-        <pre :class="{ 'font-weight-bold': i === undoRedoIndex }">{{x}}</pre>
-      </li>
-    </ol>
+          <b-button 
+            v-for="c, i in sampleCards"
+            :key="i"
+            class="mr-2 mb-2" 
+            @click="loadCard(sampleCards[i])"
+          >
+            Sample Card {{ i + 1 }}
+          </b-button>
+        </b-col>
+        <b-col xs="12" sm="3">
+          <b-button class="mr-2 mb-2" :disabled="!canUndo" @click="undo">Undo</b-button>
+          <b-button class="mr-2 mb-2" :disabled="!canRedo" @click="redo">Redo</b-button>
+          <div style="overflow-y: scroll; max-height: 50vh">
+            <b-list-group flush>
+              <b-list-group-item
+                v-for="x, i in undoRedoBuffer" 
+                :key="i"
+                :active="i === undoRedoIndex"
+                href="#"
+                @click="undoRedo(i)"
+              >
+                <pre :style="{ color: i === undoRedoIndex ? 'white' : '' }">{{ JSON.stringify(x, null, 2) }}</pre>
+              </b-list-group-item>
+            </b-list-group>
+          </div>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, Ref, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { blankCard, cloneCard, sampleCards, areCardsEquivalent, ContactCard } from './data'
 
-interface ContactCard {
-  firstName: string
-  lastName: string
-  email: string
-  birthday: string
+// start off with a blank card
+const currentCard = ref(cloneCard(blankCard))
+
+function loadCard(card: ContactCard) {
+  currentCard.value = cloneCard(card)
 }
 
-const currentCard: Ref<ContactCard> = ref({ firstName: "", lastName: "", email: "", birthday: "" })
+///////////////////////////////////////////////////////////////////////////////////////
+// form validation
 
 const emailValidation = computed(() => {
+  // these are very simplistic rules, just for demonstration purposes
   if (currentCard.value.email.length === 0) {
     return "An e-mail address is required."
   } else if (currentCard.value.email.indexOf("@") <= 0) {
@@ -68,59 +89,52 @@ const emailValidation = computed(() => {
   }
 })
 
-const sampleCards: ContactCard[] = [
-  {
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@notreal.cs.duke.edu",
-    birthday: "1900-01-01",
-  },
-  {
-    firstName: "Wei",
-    lastName: "Zhang",
-    email: "wei.zhang@notreal.cs.duke.edu",
-    birthday: "1990-01-01",
-  },
-]
+///////////////////////////////////////////////////////////////////////////////////////
+// undo/redo buffer
 
-function loadSampleCard(card: ContactCard) {
-  // currentCard.value = JSON.parse(JSON.stringify(card))
-  currentCard.value = { ...card }
-}
-
-function handleClickSampleCard1() {
-  loadSampleCard(sampleCards[0])  
-}
-
-function handleClickSampleCard2() {
-  loadSampleCard(sampleCards[1])  
-}
-
-const undoRedoBuffer = ref([JSON.stringify(currentCard.value)])
+const undoRedoBuffer = ref([cloneCard(currentCard.value)])
 let undoRedoIndex = ref(0)
 
+watch(
+  currentCard, 
+  () => {
+    if (areCardsEquivalent(undoRedoBuffer.value[undoRedoIndex.value], currentCard.value)) {
+      // effectively no change relative to what is in the undo/redo buffer
+      return
+    }
+
+    // add new undo entry and delete everything ahead of this point
+    undoRedoBuffer.value.splice(++undoRedoIndex.value, undoRedoBuffer.value.length, cloneCard(currentCard.value))
+  }, 
+  // necessary because need to pick up on changes to fields inside currentCard
+  { deep: true }
+)
+
 function undo() {
-  currentCard.value = JSON.parse(undoRedoBuffer.value[--undoRedoIndex.value])
+  // TODO:
 }
 
-const canUndo = computed(() => undoRedoIndex.value > 0)
+const canUndo = computed(() => 
+  // TODO:
+  false
+)
 
 function redo() {
-  currentCard.value = JSON.parse(undoRedoBuffer.value[++undoRedoIndex.value])
+  // TODO:
 }
 
-const canRedo = computed(() => undoRedoIndex.value + 1 !== undoRedoBuffer.value.length)
+const canRedo = computed(() => 
+  // TODO:
+  false
+)
 
-watch(currentCard, () => {
-  const newString = JSON.stringify(currentCard.value)
-  if (undoRedoIndex.value !== -1 && undoRedoBuffer.value[undoRedoIndex.value] === newString) {
-    return
-  }
-  if (undoRedoIndex.value + 1 === undoRedoBuffer.value.length) {
-    undoRedoBuffer.value.push(newString)
-  } else {
-    undoRedoBuffer.value.splice(undoRedoIndex.value + 1, undoRedoBuffer.value.length, newString)
-  }
-  ++undoRedoIndex.value
-}, { deep: true })
+function undoRedo(i: number) {
+  // TODO:
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+// dirty flag
+
+let lastSavedUndoRedoIndex = 0
+const dirty = computed(() => undoRedoIndex.value !== lastSavedUndoRedoIndex)
 </script>

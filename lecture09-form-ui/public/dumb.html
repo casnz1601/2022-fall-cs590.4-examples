@@ -1,0 +1,14 @@
+<script>
+  const card = {}
+  ;["firstName", "lastName", "email", "birthday"].forEach(field => {
+    card[field] = prompt(field)
+  })
+  fetch(
+    "/api/card", 
+    { 
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify(card) 
+    }
+  ).then(response => alert("Done! " + response.status))
+</script>

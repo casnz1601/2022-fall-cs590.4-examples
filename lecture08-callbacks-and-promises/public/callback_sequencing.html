@@ -1,0 +1,40 @@
+<script>
+function findPrimes(n = 49999999) {
+  const a = new Array(n + 1)
+  a.fill(true)
+  a[0] = false
+  a[1] = false
+
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    for (let j = 2; i * j <= n; j++) {
+      a[i * j] = false
+    }
+  }
+
+  // completely done now
+  return a.flatMap((x, i) => x ? [i] : [])
+}
+
+function now() {
+  return new Date().toLocaleTimeString()
+}
+
+function start() {
+  console.log(1, now()); findPrimes()
+  console.log(2, now()); requestAnimationFrame(() => {
+    console.log(3, now()); findPrimes()
+    console.log(4, now())
+  })
+  console.log(5, now()); findPrimes()
+  console.log(6, now()); setTimeout(() => {
+    console.log(7, now()); findPrimes()
+    console.log(8, now())
+  }, 0)
+  console.log(9, now()); findPrimes()
+  console.log(10, now())
+}
+</script>
+<body>
+  <h2>Open the JavaScript console to see this in action</h2>
+  <button onclick="start()">Go</button>
+</body>

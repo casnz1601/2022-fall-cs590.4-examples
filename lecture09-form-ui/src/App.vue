@@ -111,25 +111,19 @@ watch(
 )
 
 function undo() {
-  // TODO:
+  loadCard(undoRedoBuffer.value[--undoRedoIndex.value])
 }
 
-const canUndo = computed(() => 
-  // TODO:
-  false
-)
+const canUndo = computed(() => undoRedoIndex.value > 0)
 
 function redo() {
-  // TODO:
+  loadCard(undoRedoBuffer.value[++undoRedoIndex.value])
 }
 
-const canRedo = computed(() => 
-  // TODO:
-  false
-)
+const canRedo = computed(() => undoRedoIndex.value + 1 !== undoRedoBuffer.value.length)
 
 function undoRedo(i: number) {
-  // TODO:
+  loadCard(undoRedoBuffer.value[undoRedoIndex.value = i])
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////

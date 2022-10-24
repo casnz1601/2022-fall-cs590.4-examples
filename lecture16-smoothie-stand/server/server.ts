@@ -111,12 +111,34 @@ app.put("/api/order/:orderId", async (req, res) => {
   const order: Order = req.body
 
   // TODO: validate order object
+
+  const condition: any = {
+    _id: new ObjectId(req.params.orderId),
+    state: { 
+      $in: [
+        // because PUT is idempotent, ok to call PUT twice in a row with the existing state
+        order.state
+      ]
+    },
+  }
+  switch (order.state) {
+    case "blending":
+      condition.state.$in.push("queued")
+      // can only go to blending state if no operator assigned (or is the current user, due to idempotency)
+      condition.$or = [{ operatorId: { $exists: false }}, { operatorId: order.operatorId }]
+      break
+    case "done":
+      condition.state.$in.push("blending")
+      condition.operatorId = order.operatorId
+      break
+    default:
+      // invalid state
+      res.status(400).json({ error: "invalid state" })
+      return
+  }
   
   const result = await orders.updateOne(
-    {
-      _id: new ObjectId(req.params.orderId),
-      state: { $in: ["queued", "blending"] },
-    },
+    condition,
     {
       $set: {
         state: order.state,
@@ -125,7 +147,7 @@ app.put("/api/order/:orderId", async (req, res) => {
     }
   )
 
-  if (result.modifiedCount === 0) {
+  if (result.matchedCount === 0) {
     res.status(400).json({ error: "orderId does not exist or state change not allowed" })
     return
   }

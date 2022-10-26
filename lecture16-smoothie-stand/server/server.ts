@@ -15,7 +15,7 @@ let operators: Collection
 
 // set up Express
 const app = express()
-const port = 8095
+const port = parseInt(process.env.PORT) || 8095
 app.use(bodyParser.json())
 
 // set up Pino logging

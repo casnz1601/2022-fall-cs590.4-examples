@@ -30,10 +30,16 @@ const customers: Customer[] = [
 async function main() {
   await client.connect()
   console.log('Connected successfully to MongoDB')
-  
-  // add data
+
   const db = client.db("test")
 
+  // set up unique index for upsert -- to make sure a customer cannot have more than one draft order
+  db.collection("orders").createIndex(
+    { customerId: 1 }, 
+    { unique: true, partialFilterExpression: { state: "draft" } }
+  )
+
+  // add data
   console.log("inserting customers", await db.collection("customers").insertMany(customers as any))
   console.log("inserting operators", await db.collection("operators").insertMany(operators as any))
 

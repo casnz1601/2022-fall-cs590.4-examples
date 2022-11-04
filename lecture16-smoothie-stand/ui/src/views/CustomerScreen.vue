@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, Ref } from 'vue'
 import { CustomerWithOrders } from "../../../server/data"
 
 // props

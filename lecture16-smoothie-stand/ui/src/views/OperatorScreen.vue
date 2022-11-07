@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
-import { Operator } from "../../../server/data"
+import { onMounted, ref, computed, Ref } from 'vue'
+import { Operator, Order } from "../../../server/data"
 
 // props
 interface Props {

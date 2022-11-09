@@ -49,7 +49,6 @@ app.use(session({
 declare module 'express-session' {
   export interface SessionData {
     credits?: number
-    passport: any
   }
 }
 

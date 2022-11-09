@@ -5,8 +5,8 @@ networks:
     external: false
 
 volumes:
-  keycloak:
-    driver: local
+  # keycloak:
+  #   driver: local
   mongo:
     driver: local
 
@@ -49,6 +49,8 @@ services:
     depends_on:
       - ui1
       - ui2
+      - server1
+      - server2
   # keycloak:
   #   image: keycloak
   #   container_name: keycloak

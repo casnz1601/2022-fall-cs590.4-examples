@@ -68,14 +68,6 @@ function checkAuthenticated(req: Request, res: Response, next: NextFunction) {
 }
 
 // app routes
-app.get("/api/logout", (req, res) => {
-  res.send(`
-<form method="POST">
-<input type="submit" value="Logout">
-</form>   
-  `)
-})
-
 app.post(
   "/api/logout", 
   (req, res, next) => {
@@ -88,16 +80,16 @@ app.post(
   }
 )
 
+app.get("/api/orders", async (req, res) => {
+  res.status(200).json(await orders.find({ state: { $ne: "draft" }}).toArray())
+})
+
 app.get("/api/user", (req, res) => {
-  res.json(req.user)
+  res.json(req.user || {})
 })
 
 app.get("/api/possible-ingredients", checkAuthenticated, (req, res) => {
   res.status(200).json(possibleIngredients)
-})
-
-app.get("/api/orders", async (req, res) => {
-  res.status(200).json(await orders.find({ state: { $ne: "draft" }}).toArray())
 })
 
 app.get("/api/customer", checkAuthenticated, async (req, res) => {
@@ -222,7 +214,7 @@ app.put("/api/order/:orderId", checkAuthenticated, async (req, res) => {
 
 // connect to Mongo
 client.connect().then(() => {
-  console.log('Connected successfully to MongoDB')
+  logger.info('connected successfully to MongoDB')
   db = client.db("test")
   operators = db.collection('operators')
   orders = db.collection('orders')
@@ -235,6 +227,7 @@ client.connect().then(() => {
       { 
         client,
         params: {
+          // this forces a fresh login screen every time
           prompt: "login"
         }
       },
@@ -278,7 +271,7 @@ client.connect().then(() => {
 
     // start server
     app.listen(port, () => {
-      console.log(`Smoothie server listening on port ${port}`)
+      logger.info(`Smoothie server listening on port ${port}`)
     })
   })
 })

@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, inject, Ref } from 'vue'
+import { watch, ref, inject, Ref } from 'vue'
 import { CustomerWithOrders } from "../../../server/data"
 
 const customer: Ref<CustomerWithOrders | null> = ref(null)
@@ -35,7 +35,7 @@ async function refresh() {
     draftOrderIngredients.value = (await (await fetch("/api/customer/draft-order")).json())?.ingredients || []
   }
 }
-onMounted(refresh)
+watch(user, refresh, { immediate: true })
 
 async function save() {
   await fetch(

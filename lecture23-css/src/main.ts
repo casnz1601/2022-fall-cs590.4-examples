@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import App from '@/App.vue'
 import Scrollable from '@/views/Scrollable.vue'
+import Positioning from '@/views/Positioning.vue'
 import Grid from '@/views/Grid.vue'
 
 import { BootstrapVue, BootstrapVueIcons } from "bootstrap-vue"
@@ -19,6 +20,10 @@ const router = new VueRouter({
     {
       path: "/scrollable",
       component: Scrollable,
+    },
+    {
+      path: "/positioning",
+      component: Positioning,
     },
     {
       path: "/grid",

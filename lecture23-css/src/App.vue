@@ -6,6 +6,7 @@
       </b-navbar-brand>
       <b-navbar-nav>
         <b-nav-item href="/scrollable">Scrollable</b-nav-item>
+        <b-nav-item href="/grid">Grid</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
     <router-view />

@@ -22,10 +22,11 @@ services:
       - lecture21
   server2:
     image: server
+    build: ./server
     environment:
       - MONGO_URL=mongodb://mongo
     depends_on:
-      - server1
+      - mongo
     networks:
       - lecture21
   ui1:
@@ -35,8 +36,7 @@ services:
       - lecture21
   ui2:
     image: ui
-    depends_on:
-      - ui1
+    build: ./ui
     networks:
       - lecture21
   load_balancer:

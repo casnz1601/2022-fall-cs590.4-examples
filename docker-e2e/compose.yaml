@@ -1,0 +1,40 @@
+version: "3"
+
+networks:
+  lecture22:
+    external: false
+
+volumes:
+  mongo:
+    driver: local
+
+services:
+  server1:
+    image: server
+    build: 
+      context: .
+      dockerfile: Dockerfile.server
+    environment:
+      - MONGO_URL=mongodb://mongo
+    depends_on:
+      - mongo
+    networks:
+      - lecture22
+    ports:
+      - "127.0.0.1:8080:80"
+  e2e:
+    image: e2e
+    build: 
+      context: .
+      dockerfile: Dockerfile.e2e
+    depends_on:
+      - server1
+    networks:
+      - lecture22
+  mongo:
+    image: mongo:4
+    restart: always
+    networks:
+      - lecture22
+    volumes:
+      - mongo:/data/db
